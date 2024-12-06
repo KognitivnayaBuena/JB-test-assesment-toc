@@ -1,19 +1,3 @@
-// const http = require('http');
-
-// const PORT = 3000;
-
-// const server = http.createServer((req, res) => {
-//   res.writeHead(200, { 'Content-Type': 'application/json' });
-//   const data = { message: 'Hello, World!', success: true };
-//   res.end(JSON.stringify(data));
-// });
-
-// server.listen(PORT, () => {
-//   console.log(`Server is running on http://localhost:${PORT}`);
-// });
-
-// ----
-
 import express from "express";
 import path from "path";
 

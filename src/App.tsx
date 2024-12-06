@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react';
+
+import Accordion from './componets/Accordion';
+import { TOCData } from './componets/types';
+
 import './App.module.css'
 
 function App() {
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<TOCData | null>(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -17,10 +21,9 @@ function App() {
       .catch((err) => setError(err.message));
   }, []);
 
-  console.log("data", data);
   return (
     <>
-      test
+      {data && <Accordion data={data} />}
     </>
   )
 }
