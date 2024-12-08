@@ -16,35 +16,49 @@
 
 :root {
   font-family: 'JetBrainsMono', sans-serif;
-  line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  --color-light-grey1: #F4F4F4;
+  --color-light-grey2: #E8E8E8;
+  --color-light-grey3: #D1D1D2;
+
+  --color-dark-grey1: #19191C;
+  --color-dark-grey2: #252527;
+  --color-dark-grey3: #303033;
+
+  --color-light-purple1: #6B57FF;
+  --color-dark-purple1: #7B61FF;
+
+  color-scheme: light dark;
+  color: var(--color-white);
+  background-color: var(--color-dark-grey1);
 }
 
 body {
   margin: 0;
   display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  font-size: 13px;
+  line-height: 20px;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+p {
+  margin: 0;
+  padding: 0;
 }
 
 @media (prefers-color-scheme: light) {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    color: var(--color-dark-grey1);
+    background-color: var(--color-white);
   }
 }

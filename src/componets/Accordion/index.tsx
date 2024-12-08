@@ -1,9 +1,14 @@
 import React, { useState } from "react";
 
 import AccordionItem from "./AccordionItem";
+
 import { TOCData } from "../types";
+import { useFocusContext } from "../../context/FocusContext";
+
+import styles from "./Accordion.module.css";
 
 const Accordion: React.FC<{ data: TOCData }> = ({ data }) => {
+  const { focusedElement, setFocusedElement } = useFocusContext();
   const [openItems, setOpenItems] = useState<Record<string, boolean>>({});
   const { entities, topLevelIds } = data;
 
@@ -14,6 +19,7 @@ const Accordion: React.FC<{ data: TOCData }> = ({ data }) => {
       const newOpenItems = { ...prev };
       const page = data.entities.pages[id];
       const parentId = page.parentId;
+      const newFocusedElement = focusedElement === id ? focusedElement : id ;
 
       // TODO: Is keep closing siiblings or leave them open? 
       // Object.keys(prev).forEach((key) => {
@@ -25,12 +31,15 @@ const Accordion: React.FC<{ data: TOCData }> = ({ data }) => {
 
 
       newOpenItems[id] = !prev[id];
+
+      setFocusedElement(newFocusedElement);
       return newOpenItems;
     });
   };
  
   return (
-    <div>
+    <div className={styles.accordion}>
+      
       {topLevelIds.map((id) => {
         const page = entities?.pages[id];
         return (
@@ -43,6 +52,7 @@ const Accordion: React.FC<{ data: TOCData }> = ({ data }) => {
           />
         );
       })}
+     
     </div>
   );
 };

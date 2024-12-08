@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import { FocusProvider } from './context/FocusContext';
+
 import Accordion from './componets/Accordion';
 import { TOCData } from './componets/types';
 
@@ -22,9 +24,9 @@ function App() {
   }, []);
 
   return (
-    <>
+    <FocusProvider>
       {data && <Accordion data={data} />}
-    </>
+    </FocusProvider>
   )
 }
 
