@@ -1,17 +1,17 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
 interface FocusContextType {
-  focusedElement: string | null;
-  setFocusedElement: (id: string | null) => void;
+  focusedElementPath: string | null;
+  setFocusedElementPath: (id: string | null) => void;
 }
 
 const FocusContext = createContext<FocusContextType | null>(null);
 
 export const FocusProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [focusedElement, setFocusedElement] = useState<string | null>(null);
+  const [focusedElementPath, setFocusedElementPath] = useState<string | null>(null);
 
   return (
-    <FocusContext.Provider value={{ focusedElement, setFocusedElement }}>
+    <FocusContext.Provider value={{ focusedElementPath, setFocusedElementPath }}>
       {children}
     </FocusContext.Provider>
   );

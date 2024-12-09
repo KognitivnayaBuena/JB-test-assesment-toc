@@ -51,7 +51,7 @@ body {
   line-height: 20px;
 }
 
-p {
+ul, p {
   margin: 0;
   padding: 0;
 }
