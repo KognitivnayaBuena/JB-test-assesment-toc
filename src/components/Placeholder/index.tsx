@@ -3,7 +3,7 @@ import styles from './Placeholder.module.css';
 
 const Placeholder: React.FC = () => {
   return (
-    <div className={styles.placeholder}>
+    <div className={styles.placeholder} data-testid="loader">
       <p>Loading Table of Contents...</p>
     </div>
   );

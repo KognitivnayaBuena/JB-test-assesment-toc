@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-// import { motion } from 'framer-motion';
+import { motion } from "motion/react";
 
 import { TOCNode } from './utils';
 import { useFocusContext } from '../../context/FocusContext';
@@ -25,16 +25,20 @@ const TreeNode: React.FC<{ node: TOCNode }> = ({ node }) => {
   };
 
   return (
-    <li className={`
-      ${styles.node}
-      ${isNodeInsideOfFocusedList ? styles.nodeLabelExpanded : ''}
-      ${isNodeInsideOfFocusedList && node.level >= 1 ? styles.deepNodeLabel : ""}
-    `}>
+    <li
+      className={`
+        ${styles.node}
+        ${isNodeInsideOfFocusedList ? styles.nodeLabelExpanded : ''}
+        ${isNodeInsideOfFocusedList && node.level >= 1 ? styles.deepNodeLabel : ""}
+      `}
+      data-testid={`nodeLi-${node.id}`}
+    >
       <div
         className={`
           ${styles.nodeLabel}
           ${isFocused ? styles.nodeLabelFocused : ""}
         `}
+        data-testid={`nodeLabel-${node.id}`}
         onClick={toggleNode}
       >
         <p
@@ -51,15 +55,6 @@ const TreeNode: React.FC<{ node: TOCNode }> = ({ node }) => {
         </p>
       </div>
       {isExpanded && node.children.length > 0 && (
-        <ul
-          className={styles.children}
-        >
-          {node.children.map((child) => (
-            <TreeNode key={child.id} node={child} />
-          ))}
-        </ul>
-      )}
-      {/* {isExpanded && node.children.length > 0 && (
         <motion.ul
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: 'auto', opacity: 1 }}
@@ -70,7 +65,7 @@ const TreeNode: React.FC<{ node: TOCNode }> = ({ node }) => {
             <TreeNode key={child.id} node={child} />
           ))}
         </motion.ul>
-      )} */}
+      )}
     </li>
   );
 };

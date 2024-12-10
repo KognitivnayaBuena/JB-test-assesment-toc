@@ -3,29 +3,36 @@ import React from 'react';
 import TreeNode from './TreeNode';
 
 import styles from './TableOfContent.module.css';
+import { FocusProvider } from '../../context/FocusContext';
+import { TOCData } from './types';
+import Placeholder from '../Placeholder';
+import useFetch from '../../hooks/useFetch';
+import { mapDataToTree } from './utils';
 
-interface TOCNode {
-  id: string;
-  title: string;
-  path: string;
-  url?: string;
-  level: number;
-  children: TOCNode[];
-}
+const TableOfContent: React.FC = () => {
+  const [data, loading, error] = useFetch<TOCData>('/serverData/TOCData.json');
 
-interface TOCProps {
-  data: TOCNode[];
-}
+  if (loading) return <Placeholder />;
+  if (error) return <div data-testid="error-message">Error: {error.message}</div>;
+  const tocData = data ? mapDataToTree(data) : [];
 
-const TableOfContent: React.FC<TOCProps> = ({ data }) => {
   return (
-    <div className={styles.tocContainer}>
+    <FocusProvider>
+      <div style={{ display: 'flex' }}>
+        <aside style={{ width: '284px', borderRight: '1px solid #ccc' }}>
+        <div className={styles.tocContainer}>
       <ul className={styles.tree}>
-        {data.map((node) => (
+        {tocData.map((node) => (
           <TreeNode key={node.id} node={node} />
         ))}
       </ul>
     </div>
+        </aside>
+        <main className={styles.main}>
+          <h1>Content Area</h1>
+        </main>
+      </div>
+    </FocusProvider>
   );
 };
 

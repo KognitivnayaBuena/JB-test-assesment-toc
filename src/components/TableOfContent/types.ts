@@ -16,10 +16,16 @@ export interface Page {
   anchors: string[];
 }
 
+export interface TOCEntity {
+  id: string;
+  title: string;
+  level: number;
+  pages?: string[];
+}
+
 export interface TOCData {
   entities: {
-    pages: Record<string, Page>;
-    anchors: Record<string, Anchor>;
+    pages: Record<string, TOCEntity>;
   };
   topLevelIds: string[];
 }

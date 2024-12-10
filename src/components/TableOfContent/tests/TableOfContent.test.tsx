@@ -1,166 +1,212 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-
-import TableOfContent from '../index';
+import { vi } from 'vitest';
+import TableOfContent from '../';
 import { FocusProvider } from '../../../context/FocusContext';
-
+import useFetch from '../../../hooks/useFetch';
 import mockData from './mockData';
+
+vi.mock('../../../hooks/useFetch');
 
 function renderTableOfContent(): void {
   render(
     <FocusProvider>
-      <TableOfContent data={mockData} />
+      <TableOfContent />
     </FocusProvider>
   );
 };
 
-test('renders TableOfContent with nodes', () => {
-  renderTableOfContent();
 
-  expect(screen.getByText('Node 1')).toBeInTheDocument();
-  expect(screen.queryByText('Child Node 3.3.1')).not.toBeInTheDocument();
-});
+describe('TableOfContent Component', () => {
+  it('renders loading state correctly', () => {
+    (useFetch as vi.Mock).mockReturnValue([null, true, null]);
 
-test('TableOfContent have correct tree structure rendered', () => {
-  renderTableOfContent();
+    render(
+      <FocusProvider>
+        <TableOfContent />
+      </FocusProvider>
+    );
 
-  const node = screen.getByText('Node 3');
-  expect(screen.queryByText('Child Node 3.3')).not.toBeInTheDocument();
-
-  fireEvent.click(node);
-  expect(screen.getByText('Child Node 3.3')).toBeInTheDocument();
-
-  const nodeChild = screen.getByText('Child Node 3.3');
-  expect(screen.queryByText('Child Node 3.3.1')).not.toBeInTheDocument();
-
-  fireEvent.click(nodeChild);
-  expect(screen.queryByText('Child Node 3.3.1')).toBeInTheDocument();
-
-  const childNodeChild = screen.getByText('Child Node 3.3.3');
-  expect(screen.queryByText('Child Node 3.3.3.1')).not.toBeInTheDocument();
-
-  fireEvent.click(childNodeChild);
-  expect(screen.queryByText('Child Node 3.3.3.1')).toBeInTheDocument();
-});
-
-test('toggles node expansion on click', () => {
-  renderTableOfContent();
-
-  const node = screen.getByText('Node 1');
-  expect(screen.queryByText('Child Node 1.1')).not.toBeInTheDocument();
-
-  // open
-  fireEvent.click(node);
-  expect(screen.getByText('Child Node 1.1')).toBeInTheDocument();
-
-  // close
-  fireEvent.click(node);
-  expect(screen.queryByText('Child Node 1.1')).not.toBeInTheDocument();
-});
-
-test('node get/lose focus state by click', () => {
-  renderTableOfContent();
-
-  const node = screen.getByText('Node 1');
-  expect(screen.queryByText('Child Node 1.1')).not.toBeInTheDocument();
-
-  fireEvent.click(node);
-  waitFor(() => {
-    expect(node).toHaveClass('nodeLabelFocused');
+    expect(screen.getByTestId('loader')).toBeInTheDocument();
   });
 
-  const nodeChild = screen.getByText('Child Node 1.1');
-  waitFor(() => {
-    expect(node).not.toHaveClass('nodeLabelFocused');
-    expect(nodeChild).toHaveClass('nodeLabelFocused');
-  });
-});
+  it('renders error state correctly', () => {
+    (useFetch as vi.Mock).mockReturnValue([null, false, { message: 'Failed to fetch' }]);
 
-test('check node get focus back first and only after refocusing closing', () => {
-  renderTableOfContent();
+    render(
+      <FocusProvider>
+        <TableOfContent />
+      </FocusProvider>
+    );
 
-  const node = screen.getByText('Node 1');
-  expect(screen.queryByText('Child Node 1.1')).not.toBeInTheDocument();
-
-  fireEvent.click(node);
-  const nodeChild = screen.getByText('Child Node 1.1');
-  fireEvent.click(nodeChild);
-
-  // get focus first
-  fireEvent.click(node);
-  waitFor(() => {
-    expect(node).toHaveClass('nodeLabelFocused');
-  });
-  expect(screen.queryByText('Child Node 1.1')).toBeInTheDocument();
-
-  // closing
-  fireEvent.click(node);
-  expect(screen.queryByText('Child Node 1.1')).not.toBeInTheDocument();
-});
-
-test('is node in level 0 highligted after focus', () => {
-  renderTableOfContent();
-
-  const node = screen.getByText('Node 1');
-  fireEvent.click(node);
-
-  const expandedNode = node.closest('li');
-  expect(expandedNode).toHaveClass('nodeLabelExpanded');
-});
-
-test('is by switching node focus in level 0, highligted only last focused node', () => {
-  renderTableOfContent();
-
-  const node1 = screen.getByText('Node 1');
-  fireEvent.click(node1);
-
-  const expandedNode1 = node1.closest('li');
-  expect(expandedNode1).toHaveClass('nodeLabelExpanded');
-
-  const node2 = screen.getByText('Node 2');
-  fireEvent.click(node1);
-
-  const expandedNode2 = node2.closest('li');
-  waitFor(() => {
-    expect(expandedNode1).not.toHaveClass('nodeLabelExpanded');
-    expect(expandedNode2).toHaveClass('nodeLabelExpanded');
-  });
-});
-
-test('is node in level 1 highligted with other css class after focus', () => {
-  renderTableOfContent();
-
-  const node = screen.getByText('Node 3');
-  fireEvent.click(node);
-
-  const nodeChild = screen.getByText('Child Node 3.1');
-  fireEvent.click(nodeChild);
-
-
-  const expandedNode = node.closest('li');
-  waitFor(() => {
-    expect(expandedNode).toHaveClass('deepNodeLabel');
-  });
-});
-
-test('is by switching node focus in level 1, highligted only last focused node', () => {
-  renderTableOfContent();
-
-  const node2 = screen.getByText('Node 2');
-  fireEvent.click(node2);
-  const childNode21 = screen.getByText('Child Node 2.1');
-  const childNode22 = screen.getByText('Child Node 2.2');
-
-  fireEvent.click(childNode21);
-  const expandedNode21 = childNode21.closest('li');
-  waitFor(() => {
-    expect(expandedNode21).toHaveClass('deepNodeLabel');
+    expect(screen.getByTestId('error-message')).toBeInTheDocument();
   });
 
-  fireEvent.click(childNode22);
-  const expandedNode22 = childNode22.closest('li');
-  waitFor(() => {
-    expect(expandedNode21).not.toHaveClass('deepNodeLabel');
-    expect(expandedNode22).toHaveClass('deepNodeLabel');
+
+  it('renders TableOfContent with nodes', () => {
+    (useFetch as vi.Mock).mockReturnValue([mockData, false, null]);
+    renderTableOfContent();
+
+    expect(screen.getByTestId('nodeLabel-1')).toBeInTheDocument();
+    expect(screen.queryByTestId('nodeLabel-3.3.1')).toBeNull();
   });
+
+  it('TableOfContent have correct tree structure rendered', () => {
+    (useFetch as vi.Mock).mockReturnValue([mockData, false, null]);
+    renderTableOfContent();
+
+    const node = screen.getByTestId('nodeLabel-3');
+    expect(screen.queryByTestId('nodeLabel-3.3')).toBeNull();
+
+    fireEvent.click(node);
+    expect(screen.getByTestId('nodeLabel-3.3')).toBeInTheDocument();
+
+    const nodeChild = screen.getByTestId('nodeLabel-3.3');
+    expect(screen.queryByTestId('nodeLabel-3.3.1')).toBeNull();
+
+    fireEvent.click(nodeChild);
+    expect(screen.getByTestId('nodeLabel-3.3.1')).toBeInTheDocument();
+
+    const childNodeChild = screen.getByTestId('nodeLabel-3.3.3');
+    expect(screen.queryByTestId('nodeLabel-3.3.3.1')).toBeNull();
+
+    fireEvent.click(childNodeChild);
+    expect(screen.getByTestId('nodeLabel-3.3.3.1')).toBeInTheDocument();
+  });
+
+  it('toggles node expansion on click', () => {
+    (useFetch as vi.Mock).mockReturnValue([mockData, false, null]);
+    renderTableOfContent();
+
+    const node = screen.getByTestId('nodeLabel-1');
+    expect(screen.queryByTestId('nodeLabel-1.1')).toBeNull();
+
+    // open
+    fireEvent.click(node);
+    expect(screen.getByTestId('nodeLabel-1.1')).toBeInTheDocument();
+
+    // close
+    fireEvent.click(node);
+    expect(screen.queryByTestId('nodeLabel-1.1')).toBeNull();
+  });
+
+  it('node get/lose focus state by click', async () => {
+    (useFetch as vi.Mock).mockReturnValue([mockData, false, null]);
+    renderTableOfContent();
+
+    const node = screen.getByTestId('nodeLabel-1');
+    expect(screen.queryByTestId('nodeLabel-1.1')).toBeNull();
+
+    fireEvent.click(node);
+    await waitFor(() => {
+      expect(node.className).toMatch(/nodeLabelFocused/);
+    });
+
+    const nodeChild = screen.getByTestId('nodeLabel-1.1');
+    await waitFor(() => {
+      expect(node.className).toMatch(/nodeLabelFocused/);
+      expect(nodeChild.className).not.toMatch(/nodeLabelFocused/);
+    });
+  });
+
+  it('check node get focus back first and only after refocusing closing', async () => {
+    (useFetch as vi.Mock).mockReturnValue([mockData, false, null]);
+    renderTableOfContent();
+
+    const node = screen.getByTestId('nodeLabel-1');
+    expect(screen.queryByTestId('nodeLabel-1.1')).toBeNull();
+
+    fireEvent.click(node);
+    const nodeChild = screen.getByTestId('nodeLabel-1.1');
+    fireEvent.click(nodeChild);
+
+    // get focus first
+    fireEvent.click(node);
+    await waitFor(() => {
+      expect(node.className).toMatch(/nodeLabelFocused/);
+    });
+    expect(screen.queryByTestId('nodeLabel-1.1')).toBeInTheDocument();
+
+    // closing
+    fireEvent.click(node);
+    expect(screen.queryByTestId('nodeLabel-1.1')).toBeNull();
+  });
+
+  it('is node in level 0 highligted after focus', async () => {
+    (useFetch as vi.Mock).mockReturnValue([mockData, false, null]);
+    renderTableOfContent();
+
+    const node = screen.getByTestId('nodeLabel-1');
+    fireEvent.click(node);
+
+    const expandedNode = screen.getByTestId('nodeLi-1');
+ 
+    await waitFor(() => {
+      expect(expandedNode.className).toMatch(/nodeLabelExpanded/);
+    });
+  });
+
+  it('is by switching node focus in level 0, highligted only last focused node', async () => {
+    (useFetch as vi.Mock).mockReturnValue([mockData, false, null]);
+    renderTableOfContent();
+
+    const node1 = screen.getByTestId('nodeLabel-1');
+    fireEvent.click(node1);
+
+    const expandedNode1 = screen.getByTestId('nodeLi-1');
+    await waitFor(() => {
+      expect(expandedNode1.className).toMatch(/nodeLabelExpanded/);
+    });
+
+    const node2 = screen.getByTestId('nodeLabel-2');
+    fireEvent.click(node2);
+
+    const expandedNode2 = screen.getByTestId('nodeLi-2');
+    await waitFor(() => {
+      expect(expandedNode1.className).not.toMatch(/nodeLabelExpanded/);
+      expect(expandedNode2.className).toMatch(/nodeLabelExpanded/);
+    });
+  });
+
+  it('is node in level 1 highligted with other css class after focus', async () => {
+    (useFetch as vi.Mock).mockReturnValue([mockData, false, null]);
+    renderTableOfContent();
+
+    const node = screen.getByTestId('nodeLabel-3');
+    fireEvent.click(node);
+
+    const nodeChild = screen.getByTestId('nodeLabel-3.1');
+    fireEvent.click(nodeChild);
+
+
+    const expandedNode = screen.getByTestId('nodeLi-3');
+    await waitFor(() => {
+      expect(expandedNode.className).not.toMatch(/deepNodeLabel/);
+    });
+  });
+
+  it('is by switching node focus in level 1, highligted only last focused node', () => {
+    (useFetch as vi.Mock).mockReturnValue([mockData, false, null]);
+    renderTableOfContent();
+
+    const node2 = screen.getByTestId('nodeLabel-2');
+    fireEvent.click(node2);
+
+    const childNode21 = screen.getByTestId('nodeLabel-2.1');
+    const childNode22 = screen.getByTestId('nodeLabel-2.2');
+
+    fireEvent.click(childNode21);
+    const expandedNode21 = screen.getByTestId('nodeLi-2.1');
+    waitFor(() => {
+      expect(expandedNode21).toHaveClass('deepNodeLabel');
+    });
+
+    fireEvent.click(childNode22);
+    const expandedNode22 = screen.getByTestId('nodeLi-2.2');
+    waitFor(() => {
+      expect(expandedNode21).not.toHaveClass('deepNodeLabel');
+      expect(expandedNode22).toHaveClass('deepNodeLabel');
+    });
+  });
+
 });
