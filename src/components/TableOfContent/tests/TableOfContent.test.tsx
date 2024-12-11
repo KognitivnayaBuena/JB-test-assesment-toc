@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { vi } from 'vitest';
+import { vi, Mock } from 'vitest';
 
 import TableOfContent from '../';
 import { FocusProvider } from '../../../context/FocusContext';
@@ -20,7 +20,7 @@ function renderTableOfContent(): void {
 
 describe('TableOfContent Component', () => {
   it('renders loading state correctly', () => {
-    (useFetch as vi.Mock).mockReturnValue([null, true, null]);
+    (useFetch as Mock).mockReturnValue([null, true, null]);
 
     render(
       <FocusProvider>
@@ -32,7 +32,7 @@ describe('TableOfContent Component', () => {
   });
 
   it('renders error state correctly', () => {
-    (useFetch as vi.Mock).mockReturnValue([null, false, { message: 'Failed to fetch' }]);
+    (useFetch as Mock).mockReturnValue([null, false, { message: 'Failed to fetch' }]);
 
     render(
       <FocusProvider>
@@ -45,7 +45,7 @@ describe('TableOfContent Component', () => {
 
 
   it('renders TableOfContent with nodes', () => {
-    (useFetch as vi.Mock).mockReturnValue([mockData, false, null]);
+    (useFetch as Mock).mockReturnValue([mockData, false, null]);
     renderTableOfContent();
 
     expect(screen.getByTestId('nodeLabel-1')).toBeInTheDocument();
@@ -53,7 +53,7 @@ describe('TableOfContent Component', () => {
   });
 
   it('TableOfContent have correct tree structure rendered', () => {
-    (useFetch as vi.Mock).mockReturnValue([mockData, false, null]);
+    (useFetch as Mock).mockReturnValue([mockData, false, null]);
     renderTableOfContent();
 
     const node = screen.getByTestId('nodeLabel-3');
@@ -76,7 +76,7 @@ describe('TableOfContent Component', () => {
   });
 
   it('toggles node expansion on click', () => {
-    (useFetch as vi.Mock).mockReturnValue([mockData, false, null]);
+    (useFetch as Mock).mockReturnValue([mockData, false, null]);
     renderTableOfContent();
 
     const node = screen.getByTestId('nodeLabel-1');
@@ -94,7 +94,7 @@ describe('TableOfContent Component', () => {
   });
 
   it('node get/lose focus state by click', async () => {
-    (useFetch as vi.Mock).mockReturnValue([mockData, false, null]);
+    (useFetch as Mock).mockReturnValue([mockData, false, null]);
     renderTableOfContent();
 
     const node = screen.getByTestId('nodeLabel-1');
@@ -113,7 +113,7 @@ describe('TableOfContent Component', () => {
   });
 
   it('check node get focus back first and only after refocusing closing', async () => {
-    (useFetch as vi.Mock).mockReturnValue([mockData, false, null]);
+    (useFetch as Mock).mockReturnValue([mockData, false, null]);
     renderTableOfContent();
 
     const node = screen.getByTestId('nodeLabel-1');
@@ -138,7 +138,7 @@ describe('TableOfContent Component', () => {
   });
 
   it('is node in level 0 highligted after focus', async () => {
-    (useFetch as vi.Mock).mockReturnValue([mockData, false, null]);
+    (useFetch as Mock).mockReturnValue([mockData, false, null]);
     renderTableOfContent();
 
     const node = screen.getByTestId('nodeLabel-1');
@@ -152,7 +152,7 @@ describe('TableOfContent Component', () => {
   });
 
   it('is by switching node focus in level 0, highligted only last focused node', async () => {
-    (useFetch as vi.Mock).mockReturnValue([mockData, false, null]);
+    (useFetch as Mock).mockReturnValue([mockData, false, null]);
     renderTableOfContent();
 
     const node1 = screen.getByTestId('nodeLabel-1');
@@ -174,7 +174,7 @@ describe('TableOfContent Component', () => {
   });
 
   it('is node in level 1 highligted with other css class after focus', async () => {
-    (useFetch as vi.Mock).mockReturnValue([mockData, false, null]);
+    (useFetch as Mock).mockReturnValue([mockData, false, null]);
     renderTableOfContent();
 
     const node = screen.getByTestId('nodeLabel-3');
@@ -191,7 +191,7 @@ describe('TableOfContent Component', () => {
   });
 
   it('is by switching node focus in level 1, highligted only last focused node', () => {
-    (useFetch as vi.Mock).mockReturnValue([mockData, false, null]);
+    (useFetch as Mock).mockReturnValue([mockData, false, null]);
     renderTableOfContent();
 
     const node2 = screen.getByTestId('nodeLabel-2');

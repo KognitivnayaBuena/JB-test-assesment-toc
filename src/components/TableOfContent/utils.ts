@@ -13,7 +13,6 @@ export interface Page {
 export interface TOCNode extends Omit<TOCEntity, 'pages'> {
   children: TOCNode[];
   path: string;
-  tabIndex: number;
 }
 
 export const mapDataToTree = (data: TOCData): TOCNode[] => {
