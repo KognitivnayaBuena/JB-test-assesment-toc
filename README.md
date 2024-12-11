@@ -22,10 +22,12 @@ npm run dev
 yarn dev
 ```
 
-You can see the client application running in your browser by going to http://localhost:5173/.
-
-In case you didn't see component it might be no data from fetching, so solution is in second console tab run this command:
+In second console tab run this command:
 
 ```bash
 node server.js
 ```
+
+You can see the client application running in your browser by going to http://localhost:5173/.
+
+Have fun :)

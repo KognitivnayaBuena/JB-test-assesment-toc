@@ -1,18 +1,22 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { vi, Mock } from 'vitest';
+import { vi } from 'vitest';
 
 import TableOfContent from '../';
 import { FocusProvider } from '../../../context/FocusContext';
-import useFetch from '../../../hooks/useFetch';
 import mockData from './mockData';
+import { TOCData } from '../types';
 
 vi.mock('../../../hooks/useFetch');
 
-function renderTableOfContent(): void {
+function renderTableOfContent(
+  data: TOCData | null,
+  loading: boolean,
+  error: Error | null
+): void {
   render(
     <FocusProvider>
-      <TableOfContent />
+      <TableOfContent data={data} loading={loading} error={error} />
     </FocusProvider>
   );
 };
@@ -20,11 +24,10 @@ function renderTableOfContent(): void {
 
 describe('TableOfContent Component', () => {
   it('renders loading state correctly', () => {
-    (useFetch as Mock).mockReturnValue([null, true, null]);
 
     render(
       <FocusProvider>
-        <TableOfContent />
+        <TableOfContent data={null} loading={true} error={null} />
       </FocusProvider>
     );
 
@@ -32,11 +35,9 @@ describe('TableOfContent Component', () => {
   });
 
   it('renders error state correctly', () => {
-    (useFetch as Mock).mockReturnValue([null, false, { message: 'Failed to fetch' }]);
-
     render(
       <FocusProvider>
-        <TableOfContent />
+        <TableOfContent data={null} loading={false} error={new Error('Failed to fetch')}  />
       </FocusProvider>
     );
 
@@ -45,16 +46,14 @@ describe('TableOfContent Component', () => {
 
 
   it('renders TableOfContent with nodes', () => {
-    (useFetch as Mock).mockReturnValue([mockData, false, null]);
-    renderTableOfContent();
+    renderTableOfContent(mockData, false, null);
 
     expect(screen.getByTestId('nodeLabel-1')).toBeInTheDocument();
     expect(screen.queryByTestId('nodeLabel-3.3.1')).toBeNull();
   });
 
   it('TableOfContent have correct tree structure rendered', () => {
-    (useFetch as Mock).mockReturnValue([mockData, false, null]);
-    renderTableOfContent();
+    renderTableOfContent(mockData, false, null);
 
     const node = screen.getByTestId('nodeLabel-3');
     expect(screen.queryByTestId('nodeLabel-3.3')).toBeNull();
@@ -76,8 +75,7 @@ describe('TableOfContent Component', () => {
   });
 
   it('toggles node expansion on click', () => {
-    (useFetch as Mock).mockReturnValue([mockData, false, null]);
-    renderTableOfContent();
+    renderTableOfContent(mockData, false, null);
 
     const node = screen.getByTestId('nodeLabel-1');
     expect(screen.queryByTestId('nodeLabel-1.1')).toBeNull();
@@ -94,8 +92,7 @@ describe('TableOfContent Component', () => {
   });
 
   it('node get/lose focus state by click', async () => {
-    (useFetch as Mock).mockReturnValue([mockData, false, null]);
-    renderTableOfContent();
+    renderTableOfContent(mockData, false, null);
 
     const node = screen.getByTestId('nodeLabel-1');
     expect(screen.queryByTestId('nodeLabel-1.1')).toBeNull();
@@ -113,8 +110,7 @@ describe('TableOfContent Component', () => {
   });
 
   it('check node get focus back first and only after refocusing closing', async () => {
-    (useFetch as Mock).mockReturnValue([mockData, false, null]);
-    renderTableOfContent();
+    renderTableOfContent(mockData, false, null);
 
     const node = screen.getByTestId('nodeLabel-1');
     expect(screen.queryByTestId('nodeLabel-1.1')).toBeNull();
@@ -138,8 +134,7 @@ describe('TableOfContent Component', () => {
   });
 
   it('is node in level 0 highligted after focus', async () => {
-    (useFetch as Mock).mockReturnValue([mockData, false, null]);
-    renderTableOfContent();
+    renderTableOfContent(mockData, false, null);
 
     const node = screen.getByTestId('nodeLabel-1');
     fireEvent.click(node);
@@ -152,8 +147,7 @@ describe('TableOfContent Component', () => {
   });
 
   it('is by switching node focus in level 0, highligted only last focused node', async () => {
-    (useFetch as Mock).mockReturnValue([mockData, false, null]);
-    renderTableOfContent();
+    renderTableOfContent(mockData, false, null);
 
     const node1 = screen.getByTestId('nodeLabel-1');
     fireEvent.click(node1);
@@ -174,8 +168,7 @@ describe('TableOfContent Component', () => {
   });
 
   it('is node in level 1 highligted with other css class after focus', async () => {
-    (useFetch as Mock).mockReturnValue([mockData, false, null]);
-    renderTableOfContent();
+    renderTableOfContent(mockData, false, null);
 
     const node = screen.getByTestId('nodeLabel-3');
     fireEvent.click(node);
@@ -191,8 +184,7 @@ describe('TableOfContent Component', () => {
   });
 
   it('is by switching node focus in level 1, highligted only last focused node', () => {
-    (useFetch as Mock).mockReturnValue([mockData, false, null]);
-    renderTableOfContent();
+    renderTableOfContent(mockData, false, null);
 
     const node2 = screen.getByTestId('nodeLabel-2');
     fireEvent.click(node2);
