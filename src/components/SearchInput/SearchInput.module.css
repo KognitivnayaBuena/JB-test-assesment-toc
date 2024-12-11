@@ -1,0 +1,18 @@
+.input {
+  width: 100%;
+  padding: 4px 16px;
+  box-sizing: border-box;
+  border-radius: 0;
+}
+.input:focus-visible {
+  outline: none;
+}
+.input:focus {
+  box-shadow: 1px 0 0 0 var(--color-purple1);
+}
+
+@media (prefers-color-scheme: dark) {
+  .input {
+    background-color: var(--color-dark-grey1);
+  }
+}

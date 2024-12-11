@@ -1,19 +1,5 @@
-import { TOCData, TOCEntity } from "./types";
-
-export interface Page {
-  id: string;
-  title: string;
-  url: string;
-  level: number;
-  parentId: string | null;
-  pages: string[];
-  anchors: string[];
-}
-
-export interface TOCNode extends Omit<TOCEntity, 'pages'> {
-  children: TOCNode[];
-  path: string;
-}
+import { TOCData } from "./types";
+import { TOCNode } from "./index";
 
 export const mapDataToTree = (data: TOCData): TOCNode[] => {
   const { entities, topLevelIds } = data;
@@ -27,8 +13,11 @@ export const mapDataToTree = (data: TOCData): TOCNode[] => {
     );
 
     return {
-      ...entity,
+      id: entity.id,
+      title: entity.title,
+      level: entity.level,
       path: currentPath,
+      href: "javascript:void(0)", // will be real url in the production application
       children,
     };
   };

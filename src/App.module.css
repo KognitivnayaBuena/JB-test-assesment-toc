@@ -1,10 +1,8 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+.main {
+  display: flex;
+  height: 100%;
 }
 
-.main {
-  flex: 1;
+.content {
+  padding: 32px;
 }
