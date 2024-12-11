@@ -46,7 +46,6 @@ const TreeNode: React.FC<{ node: TOCNode }> = ({ node }) => {
           { [styles.nodeLabelFocused]: isFocused }
         )}
         data-testid={`nodeLabel-${node.id}`}
-        tabIndex={node.tabIndex}
         onClick={toggleNode}
       >
         <p

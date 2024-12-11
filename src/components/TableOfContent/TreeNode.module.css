@@ -12,9 +12,6 @@
   box-shadow: inset 0 0 0 200px rgba(150, 150, 150, 0.1);
   color: var(--color-dark-grey1);
 }
-.nodeLabel:focus-visible {
-  outline: none;
-}
 .nodeLabel:active {
   background-color: var(--color-light-purple1);
   color: var(--color-white);
