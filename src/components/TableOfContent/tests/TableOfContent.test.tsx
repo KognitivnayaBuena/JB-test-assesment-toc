@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
+
 import TableOfContent from '../';
 import { FocusProvider } from '../../../context/FocusContext';
 import useFetch from '../../../hooks/useFetch';
@@ -87,7 +88,9 @@ describe('TableOfContent Component', () => {
 
     // close
     fireEvent.click(node);
-    expect(screen.queryByTestId('nodeLabel-1.1')).toBeNull();
+    waitFor(() => {
+      expect(screen.queryByTestId('nodeLabel-1.1')).toBeNull();
+    });
   });
 
   it('node get/lose focus state by click', async () => {
@@ -129,7 +132,9 @@ describe('TableOfContent Component', () => {
 
     // closing
     fireEvent.click(node);
-    expect(screen.queryByTestId('nodeLabel-1.1')).toBeNull();
+    waitFor(() => {
+      expect(screen.queryByTestId('nodeLabel-1.1')).toBeNull();
+    });
   });
 
   it('is node in level 0 highligted after focus', async () => {

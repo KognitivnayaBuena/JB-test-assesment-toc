@@ -37,6 +37,8 @@
   --color-light-purple1: #6B57FF;
   --color-dark-purple1: #7B61FF;
 
+  --color-red: #FF5A5F;
+
   color-scheme: light dark;
   color: var(--color-white);
   background-color: var(--color-dark-grey1);

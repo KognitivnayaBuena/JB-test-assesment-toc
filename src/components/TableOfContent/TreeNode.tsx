@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
+import classNames from 'classnames';
 
 import { TOCNode } from './utils';
 import { useFocusContext } from '../../context/FocusContext';
@@ -14,7 +14,7 @@ const TreeNode: React.FC<{ node: TOCNode }> = ({ node }) => {
   const isFocused = focusedElementPath === node.path;
   const isNodeInsideOfFocusedList = focusedElementPath
     ?.split('/')
-    .includes(node.path.split('/').at(-1));
+    .includes(node.path.split('/').at(-1) ?? '');
 
   const toggleNode = () => {
     setIsExpanded((prev) => {
@@ -24,48 +24,56 @@ const TreeNode: React.FC<{ node: TOCNode }> = ({ node }) => {
     setFocusedElementPath(node.path);
   };
 
+  const nodeLabelStyle = {
+    paddingLeft: `${node.level * 16}px`,
+    "--left": `${node.level * 16 - 12}px`,
+  } as React.CSSProperties;
+
   return (
     <li
-      className={`
-        ${styles.node}
-        ${isNodeInsideOfFocusedList ? styles.nodeLabelExpanded : ''}
-        ${isNodeInsideOfFocusedList && node.level >= 1 ? styles.deepNodeLabel : ""}
-      `}
+      className={classNames(
+        styles.node,
+        {
+          [styles.nodeLabelExpanded]: isNodeInsideOfFocusedList,
+          [styles.deepNodeLabel]: isNodeInsideOfFocusedList && node.level >= 1,
+        }
+      )}
       data-testid={`nodeLi-${node.id}`}
     >
       <div
-        className={`
-          ${styles.nodeLabel}
-          ${isFocused ? styles.nodeLabelFocused : ""}
-        `}
+        className={classNames(
+          styles.nodeLabel,
+          { [styles.nodeLabelFocused]: isFocused }
+        )}
         data-testid={`nodeLabel-${node.id}`}
+        tabIndex={node.tabIndex}
         onClick={toggleNode}
       >
         <p
-          className={`
-            ${node.children.length > 0 && styles.nodeLabelText}
-            ${isExpanded && styles.isExpanded}
-          `}
-          style={{
-            paddingLeft: `${node.level * 16}px`,
-            "--left": `${node.level * 16 - 12}px` 
-          }}
+          className={classNames(
+            { [styles.nodeLabelText]: node.children.length > 0 },
+            { [styles.isExpanded]: isExpanded }
+          )}
+          style={nodeLabelStyle}
         >
           {node.title}
         </p>
       </div>
-      {isExpanded && node.children.length > 0 && (
-        <motion.ul
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: 'auto', opacity: 1 }}
-          exit={{ height: 0, opacity: 0 }}
-          className={styles.children}
-        >
-          {node.children.map((child) => (
-            <TreeNode key={child.id} node={child} />
-          ))}
-        </motion.ul>
-      )}
+      <AnimatePresence>
+        {isExpanded && node.children.length > 0 && (
+          <motion.ul
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            key={`nodeList-${node.id}`}
+            className={styles.children}
+          >
+            {node.children.map((child) => (
+              <TreeNode key={child.id} node={child} />
+            ))}
+          </motion.ul>
+        )}
+      </AnimatePresence>
     </li>
   );
 };
