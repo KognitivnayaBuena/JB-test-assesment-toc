@@ -1,0 +1,108 @@
+.node {
+  cursor: pointer;
+}
+
+.nodeLabel {
+  padding: 8px 32px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.nodeLabel:hover {
+  box-shadow: inset 0 0 0 200px rgba(150, 150, 150, 0.1);
+  color: var(--color-dark-grey1);
+}
+.nodeLabel:active {
+  background-color: var(--color-light-purple1);
+  color: var(--color-white);
+}
+.nodeLabel:active .nodeLabelText::before {
+  border-left: 4px solid var(--color-white);
+}
+.nodeLabel:focus {
+  box-shadow: 0 0 0 1px var(--color-light-purple1);
+}
+.nodeLabelExpanded {
+  background-color: var(--color-light-grey1);
+}
+.deepNodeLabel {
+  background-color: var(--color-light-grey2);
+}
+.nodeLabelFocused {
+  background-color: var(--color-light-purple1);
+  color: var(--color-white);
+  font-weight: bold;
+}
+.nodeLabelFocused .nodeLabelText::before {
+  border-left: 4px solid var(--color-white);
+}
+.nodeLabelFocused.nodeLabel:hover {
+  background-color: var(--color-light-purple1);
+  color: var(--color-white);
+  font-weight: bold;
+}
+
+.children {
+  list-style: none;
+}
+.nodeLabelText {
+  position: relative;
+}
+.nodeLabelText::before {
+  position: absolute;
+  left: var(--left, 0px);
+  top: 5px;
+  content: "";
+  width: 0; 
+  height: 0; 
+  border-top: 4px solid transparent;
+  border-right: none;
+  border-bottom: 4px solid transparent;
+  border-left: 4px solid var(--color-dark-grey1);
+  transform: rotate(0deg);
+  transition: transform 0.3s ease;
+}
+.isExpanded.nodeLabelText::before {
+  transform: rotate(90deg);
+}
+
+@media (prefers-color-scheme: dark) {
+  .nodeLabel {
+    color: var(--color-white);
+  }
+  .nodeLabel:hover {
+    color: var(--color-white);
+  }
+  .nodeLabel:active {
+    background-color: var(--color-dark-purple1);
+  }
+  .nodeLabel:focus {
+    box-shadow: 0 0 0 1px var(--color-dark-purple1);
+  }
+  .nodeLabelText::before {
+    border-left: 4px solid var(--color-white);
+  }
+  .nodeLabelExpanded {
+    background-color: var(--color-dark-grey2);
+  }
+  .deepNodeLabel {
+    background-color: var(--color-dark-grey3);
+  }
+  .nodeLabel::before {
+    border-left: 4px solid var(--color-white);
+  }
+
+  .nodeLabelFocused {
+    background-color: var(--color-dark-purple1);
+    color: var(--color-white);
+    font-weight: bold;
+  }
+  .nodeLabelFocused .nodeLabelText::before {
+    border-left: 4px solid var(--color-white);
+  }
+  .nodeLabelFocused.nodeLabel:hover {
+    background-color: var(--color-dark-purple1);
+    color: var(--color-white);
+    font-weight: bold;
+  }
+}
