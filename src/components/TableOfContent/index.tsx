@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Placeholder from '../Placeholder';
+import Loader from '../Loader';
 import ErrorMessage from '../ErrorMessage';
 import TreeNode from './TreeNode';
 
@@ -17,7 +17,7 @@ interface TableOfContentProps {
 }
 
 const TableOfContent: React.FC<TableOfContentProps> = ({data, loading, error}) => {
-  if (loading) return <Placeholder />;
+  if (loading) return <Loader />;
   if (error) return <ErrorMessage errorMessage={error.message} />;
   const tocData = data ? mapDataToTree(data) : [];
 
