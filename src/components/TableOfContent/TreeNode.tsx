@@ -2,26 +2,25 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from "motion/react";
 import classNames from 'classnames';
 
-import { TOCNode } from './utils';
-import { useFocusContext } from '../../context/FocusContext';
+import { useActiveItemContext } from "./ActiveItemContext";
+import { TOCNode } from "./index";
 
 import styles from './TreeNode.module.css';
 
-const TreeNode: React.FC<{ node: TOCNode }> = ({ node }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  
-  const { focusedElementPath, setFocusedElementPath } = useFocusContext();
-  const isFocused = focusedElementPath === node.path;
-  const isNodeInsideOfFocusedList = focusedElementPath
+export const TreeNode: React.FC<{ node: TOCNode }> = ({ node }) => {
+  const { activePath, setActivePath } = useActiveItemContext();
+  const isActive = activePath === node.path;
+  const isInActivePath = activePath
     ?.split('/')
     .includes(node.path.split('/').at(-1) ?? '');
+  const [isExpanded, setIsExpanded] = useState(isInActivePath);
 
   const toggleNode = () => {
     setIsExpanded((prev) => {
-      if (prev && !isFocused) return prev;
+      if (prev && !isActive) return prev;
       return !prev; 
     });
-    setFocusedElementPath(node.path);
+    setActivePath(node.path);
   };
 
   const nodeLabelStyle = {
@@ -34,19 +33,20 @@ const TreeNode: React.FC<{ node: TOCNode }> = ({ node }) => {
       className={classNames(
         styles.node,
         {
-          [styles.nodeLabelExpanded]: isNodeInsideOfFocusedList,
-          [styles.deepNodeLabel]: isNodeInsideOfFocusedList && node.level >= 1,
+          [styles.nodeLabelExpanded]: isInActivePath && node.children.length > 0,
+          [styles.deepNodeLabel]: isInActivePath && node.level >= 1,
         }
       )}
       data-testid={`nodeLi-${node.id}`}
     >
-      <div
+      <a
         className={classNames(
           styles.nodeLabel,
-          { [styles.nodeLabelFocused]: isFocused }
+          { [styles.nodeLabelFocused]: isActive }
         )}
         data-testid={`nodeLabel-${node.id}`}
         onClick={toggleNode}
+        href={node.href}
       >
         <p
           className={classNames(
@@ -57,7 +57,7 @@ const TreeNode: React.FC<{ node: TOCNode }> = ({ node }) => {
         >
           {node.title}
         </p>
-      </div>
+      </a>
       <AnimatePresence>
         {isExpanded && node.children.length > 0 && (
           <motion.ul
@@ -76,5 +76,3 @@ const TreeNode: React.FC<{ node: TOCNode }> = ({ node }) => {
     </li>
   );
 };
-
-export default TreeNode;

@@ -1,45 +1,74 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 
-import Placeholder from '../Placeholder';
-import ErrorMessage from '../ErrorMessage';
-import TreeNode from './TreeNode';
+import { TreeNode } from './TreeNode';
 
-import { FocusProvider } from '../../context/FocusContext';
-import { TOCData } from './types';
-import { mapDataToTree } from './utils';
+import { ActiveItemProvider } from './ActiveItemContext';
 
 import styles from './TableOfContent.module.css';
+import { SearchInput } from "../SearchInput";
+import Loader from '../Loader';
 
 interface TableOfContentProps {
-  data: TOCData | null;
-  loading: boolean;
-  error: Error | null;
+  nodes: TOCNode[] | null;
+  isLoading: boolean;
 }
 
-const TableOfContent: React.FC<TableOfContentProps> = ({data, loading, error}) => {
-  if (loading) return <Placeholder />;
-  if (error) return <ErrorMessage errorMessage={error.message} />;
-  const tocData = data ? mapDataToTree(data) : [];
+export interface TOCNode {
+  id: string;
+  title: string;
+  level: number;
+  path: string;
+  children: TOCNode[];
+  href: string
+}
 
-  return (
-    <FocusProvider>
-      <div className={styles.tocWrapper}>
-        <nav className={styles.sidebarNavigation}>
-          <div className={styles.tocContainer}>
-            <ul className={styles.tree}>
-              {tocData.map((node) => (
-                <TreeNode key={node.id} node={node} />
-              ))}
-            </ul>
-          </div>
-        </nav>
-        <main className={styles.main}>
-          <h1>Content Area</h1>
-        </main>
-      </div>
-    </FocusProvider>
-  );
+const flattenTree = (nodes: TOCNode[]): TOCNode[] => {
+  return nodes.flatMap((node: TOCNode) => [
+    { ...node, children: [], level: 0 },
+    ...flattenTree(node.children)
+  ]);
 };
 
-export default TableOfContent;
+const buildFilteredList = (nodes: TOCNode[], filter: string): TOCNode[] => {
+  return nodes.filter(node => {
+    return node.title.toLowerCase().includes(filter.toLowerCase())
+  })
+}
+
+const Tree: React.FC<{ nodes: TOCNode[] }> = ({ nodes }) => {
+  const allNodes = useMemo(() => flattenTree(nodes), [nodes])
+  const [currentNodes, setNodes] = useState(nodes)
+
+  return (
+    <ActiveItemProvider>
+      <nav className={styles.root}>
+        <div className={styles.filter}>
+          <SearchInput
+            placeholder="Type to filter..."
+            onFilter={v => {
+              if (v === "") {
+                setNodes(nodes)
+              } else {
+                setNodes(buildFilteredList(allNodes, v))
+              }
+            }}/>
+        </div>
+        <ul className={styles.tree}>
+          {currentNodes.map((node) => (
+            <TreeNode key={node.id} node={node}/>
+          ))}
+          {currentNodes.length === 0 && <p className={styles.noResults}>No results found</p>}
+        </ul>
+      </nav>
+    </ActiveItemProvider>
+  )
+}
+
+export const TableOfContent: React.FC<TableOfContentProps> = ({ nodes, isLoading }) => {
+  if (isLoading) return <Loader />;
+
+  return (
+    <Tree nodes={nodes ?? []}/>
+  );
+};
 
